@@ -1,0 +1,9 @@
+#!/bin/sh
+
+#Unhold kernel
+in-target sh -c 'apt-mark showhold | while read kernel;do apt-mark unhold $kernel;done' || true
+
+#Readding executable bit of apt-btrfs-snapshot
+if [ -e /target/usr/bin/apt-btrfs-snapshot ] && [ ! -x /target/usr/bin/apt-btrfs-snapshot ]; then
+	chmod +x /target/usr/bin/apt-btrfs-snapshot
+fi
