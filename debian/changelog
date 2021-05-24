@@ -1,3 +1,9 @@
+live-installer (57+kaisen2) kaisen-packages; urgency=medium
+
+  * Add remove unnecessary guests additions script on 61kaisen
+
+ -- Kevin Chevreuil - Kaisen <kaisen@kaisenlinux.org>  Sun, 23 May 2020 21:04:14 +0200
+
 live-installer (57+kaisen1) kaisen-testing; urgency=medium
 
   * Add kaisen script in finish-install.d for readding executable bit of
