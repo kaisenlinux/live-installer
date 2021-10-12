@@ -3,10 +3,10 @@
 #Remove unnecessary guests additions preinstalled
 if [ -e /target/usr/bin/systemd-detect-virt ] && [ -x /target/usr/bin/systemd-detect-virt ]; then
 
-check1=$(chroot /target systemd-detect-virt || true)
-check2=$(cat /sys/class/dmi/id/sys_vendor | cut -d' ' -f1)
-result1=$(echo $check1)
-result2=$(echo $check2)
+SYSTEMD_CHECK=$(chroot /target systemd-detect-virt || true)
+SYS_CHECK=$(cat /sys/class/dmi/id/sys_vendor | cut -d' ' -f1)
+SYSTEMD_RESULT=$(echo $SYSTEMD_CHECK)
+SYS_RESULT=$(echo $SYS_CHECK)
 
 mount_fs() {
 		mount --bind /sys /target/sys
@@ -24,39 +24,51 @@ umount_fs() {
 
 mount_fs
 
-if [ $result1 = vmware ]; then
-	echo "Hypervisor detected: $result1. Removal of all other guest additions."
+if [ $SYSTEMD_RESULT = vmware ]; then
+	echo "Hypervisor detected: $SYSTEMD_RESULT. Removal of all other guest additions."
 	chroot /target apt-get autoremove --purge -y virtualbox-guest-dkms virtualbox-guest-source virtualbox-guest-utils virtualbox-guest-x11 xserver-xorg-video-qxl qemu-guest-agent spice-vdagent spice-webdavd hyperv-daemons || true
 	chroot /target update-initramfs -u -k all || true
 fi
 
-if [ $result2 = innotek ]; then
-	echo "Hypervisor detected: $result2 (VirtualBox). Removal of all other guest additions."
+if [ $SYS_RESULT = innotek ]; then
+	echo "Hypervisor detected: $SYS_RESULT (VirtualBox). Removal of all other guest additions."
 	chroot /target apt-get autoremove --purge -y open-vm-tools open-vm-tools-desktop xserver-xorg-video-qxl qemu-guest-agent spice-vdagent spice-webdavd hyperv-daemons || true
 	chroot /target update-initramfs -u -k all || true
 fi
 
-if [ $result2 = QEMU ]; then
-	echo "Hypervisor detected: $result2. Removal of all other guest additions."
+if [ $SYS_RESULT = QEMU ]; then
+	echo "Hypervisor detected: $SYS_RESULT. Removal of all other guest additions."
 	chroot /target apt-get autoremove --purge -y virtualbox-guest-dkms virtualbox-guest-source virtualbox-guest-utils virtualbox-guest-x11 open-vm-tools open-vm-tools-desktop hyperv-daemons || true
 	chroot /target update-initramfs -u -k all || true
 fi
 
-if [ $result1 = microsoft ]; then
-	echo "Hypervisor detected: $result1. Removal of all other guest additions."
+if [ $SYSTEMD_RESULT = microsoft ]; then
+	echo "Hypervisor detected: $SYSTEMD_RESULT. Removal of all other guest additions."
 	chroot /target apt-get autoremove --purge -y virtualbox-guest-dkms virtualbox-guest-source virtualbox-guest-utils virtualbox-guest-x11 open-vm-tools open-vm-tools-desktop xserver-xorg-video-qxl qemu-guest-agent spice-vdagent spice-webdavd || true
 	chroot /target update-initramfs -u -k all || true
 fi
 
-if [ $result1 = none ] || [ $result1 = zvm ] || [ $result1 = powervm ] || [ $result1 = xen ] || [ $result1 = bochs ] || [ $result1 = uml ] || [ $result1 = parallels ] || [ $result1 = bhyve ] || [ $result1 = qnx ] || [ $result1 = acrn ]; then
+if [ $SYSTEMD_RESULT = none ] || [ $SYSTEMD_RESULT = zvm ] || [ $SYSTEMD_RESULT = powervm ] || [ $SYSTEMD_RESULT = xen ] || [ $SYSTEMD_RESULT = bochs ] || [ $SYSTEMD_RESULT = uml ] || [ $SYSTEMD_RESULT = parallels ] || [ $SYSTEMD_RESULT= bhyve ] || [ $SYSTEMD_RESULT = qnx ] || [ $SYSTEMD_RESULT = acrn ]; then
 	echo "No hypervisor detected with preinstalled guest additions. Deletion of all guest additions."
 	chroot /target apt-get autoremove --purge -y virtualbox-guest-dkms virtualbox-guest-source virtualbox-guest-utils virtualbox-guest-x11 open-vm-tools open-vm-tools-desktop xserver-xorg-video-qxl qemu-guest-agent spice-vdagent spice-webdavd hyperv-daemons || true
 	chroot /target update-initramfs -u -k all || true
 fi
+fi
+
+#Check if / use BTRFS as filesystem to remove kaisen-btrfs-snapshots if BTRFS not use
+CHECK_ROOTFS1=$(grep -v -E "^(#|$)" /target/etc/fstab | head -1 | cut -d' ' -f2)
+CHECK_ROOTFS2=$(grep -v -E "^(#|$)" /target/etc/fstab | head -1 | grep -o btrfs || true)
+RESULT_ROOTFS1=$(echo $CHECK_ROOTFS1)
+RESULT_ROOTFS2=$(echo $CHECK_ROOTFS2)
+
+if [ $RESULT_ROOTFS1 = / ] && [ $RESULT_ROOTFS2 = btrfs ]; then
+	echo "BTRFS use in /. No action required."
+else
+	echo "BTRFS not use in /. Remove snapshots tools."
+        chroot /target apt-get autoremove --purge -y kaisen-btrfs-snapshots || true
+fi
 
 umount_fs
-
-fi
 
 #Unhold kernel
 chroot /target sh -c '/usr/bin/apt-mark showhold | while read kernel;do /usr/bin/apt-mark unhold $kernel;done' || true

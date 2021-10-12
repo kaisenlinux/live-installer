@@ -1,15 +1,21 @@
+live-installer (57+kaisen3) kaisen-packages; urgency=medium
+
+  * Add check to keep or remove kaisen-btrfs-snapshots
+
+ -- Kevin Chevreuil - Kaisen <kaisen@kaisenlinux.org>  Tue, 12 Oct 2021 03:24:49 +0200
+
 live-installer (57+kaisen2) kaisen-packages; urgency=medium
 
   * Add remove unnecessary guests additions script on 61kaisen
 
- -- Kevin Chevreuil - Kaisen <kaisen@kaisenlinux.org>  Sun, 23 May 2020 21:04:14 +0200
+ -- Kevin Chevreuil - Kaisen <kaisen@kaisenlinux.org>  Sun, 23 May 2021 21:04:14 +0200
 
 live-installer (57+kaisen1) kaisen-testing; urgency=medium
 
   * Add kaisen script in finish-install.d for readding executable bit of
     apt-btrfs-snapshot and unhold kernel
 
- -- Kevin Chevreuil - Kaisen <kaisen@kaisenlinux.org>  Sat, 17 Apr 2020 17:12:06 +0200
+ -- Kevin Chevreuil - Kaisen <kaisen@kaisenlinux.org>  Sat, 17 Apr 2021 17:12:06 +0200
 
 live-installer (57) unstable; urgency=medium
 
