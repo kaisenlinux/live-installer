@@ -1,3 +1,9 @@
+live-installer (57+kaisen4) kaisen-packages; urgency=medium
+
+  * Improve BTRFS check if use on /
+
+ -- Kevin Chevreuil - Kaisen <kaisen@kaisenlinux.org>  Tue, 12 Oct 2021 20:26:47 +0200
+
 live-installer (57+kaisen3) kaisen-packages; urgency=medium
 
   * Add check to keep or remove kaisen-btrfs-snapshots
