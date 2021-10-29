@@ -1,3 +1,11 @@
+live-installer (57+kaisen7) kaisen-packages; urgency=medium
+
+  * Remove rebuild of initramfs in 61kaisen (Virtualbox
+    guests kernel modules are deleted in Kaisen repositories, integrated
+    in upstream Linux) 
+
+ -- Kevin Chevreuil - Kaisen <kaisen@kaisenlinux.org>  Sat, 30 Oct 2021 00:18:15 +0200
+
 live-installer (57+kaisen6) kaisen-packages; urgency=medium
 
   * Add 2> /dev/null in btrfs check
