@@ -1,3 +1,11 @@
+live-installer (57+kaisen8) kaisen-packages; urgency=medium
+
+  * Fix grammatical of echo command when BTRFS step
+  * Add check if / partition is not mount in subvolume to remove
+    kaisen-btrfs-snapshots
+
+ -- Kevin Chevreuil - Kaisen <kaisen@kaisenlinux.org>  Mon, 15 Nov 2021 04:02:13 +0200
+
 live-installer (57+kaisen7) kaisen-packages; urgency=medium
 
   * Remove rebuild of initramfs in 61kaisen (Virtualbox
