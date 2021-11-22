@@ -46,12 +46,13 @@ fi
 
 #Check if / use BTRFS as filesystem to remove kaisen-btrfs-snapshots if BTRFS not use
 CHECK_ROOTFS=$(grep -v -E "^(#|$)" /target/etc/fstab | grep -v /bin | grep -v /boot | grep -v /etc | grep -v /home | grep -v /lib | grep -v /media | grep -v /mnt | grep -v /opt | grep -v /root | grep -v /run | grep -v /sbin | grep -v /srv | grep -v /tmp | grep -v /usr | grep -v /var | grep -o btrfs || true)
-CHECK_SUBVOL=$(grep -v -E "^(#|$)" /target/etc/fstab | grep -v /bin | grep -v /boot | grep -v /etc | grep -v /home | grep -v /lib | grep -v /media | grep -v /mnt | grep -v /opt | grep -v /root | grep -v /run | grep -v /sbin | grep -v /srv | grep -v /tmp | grep -v /usr | grep -v /var | grep -o subvol=@ || true)
+CHECK_FSTAB=$(grep -v -E "^(#|$)" /target/etc/fstab | grep -v /bin | grep -v /boot | grep -v /etc | grep -v /home | grep -v /lib | grep -v /media | grep -v /mnt | grep -v /opt | grep -v /root | grep -v /run | grep -v /sbin | grep -v /srv | grep -v /tmp | grep -v /usr | grep -v /var | grep -o subvol=@ || true)
+CHECK_SUBVOL=$(btrfs subvolume list /target | grep -o @ || true)
 
-if [ $CHECK_ROOTFS = btrfs 2> /dev/null ] && [ $CHECK_SUBVOL = "subvol=@" 2> /dev/null ]; then
-	echo "BTRFS is the filesystem use for / partition, and the / partition is mount in a subvolume. No action required."
+if [ $CHECK_ROOTFS = btrfs 2> /dev/null ] && [ $CHECK_FSTAB = "subvol=@" 2> /dev/null ] && [ $CHECK_SUBVOL = @ 2> /dev/null ]; then
+	echo "BTRFS is the filesystem use for / partition, and the / partition is mount in the @ subvolume. No action required."
 else
-	echo "BTRFS is not use for / partition or the / partition not mount in a subvolume. Remove snapshots tools."
+	echo "BTRFS is not use for / partition or the / partition is not mount in the @ subvolume. Remove snapshots tools."
         chroot /target apt-get autoremove --purge -y kaisen-btrfs-snapshots || true
 fi
 
