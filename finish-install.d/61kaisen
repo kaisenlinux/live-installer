@@ -28,20 +28,42 @@ if [ $SYSTEMD_CHECK = vmware ]; then
 
 elif [ $SYS_CHECK = innotek ]; then
 	echo "Hypervisor detected: $SYS_CHECK (VirtualBox). Removal of all other guest additions."
-	chroot /target apt-get autoremove --purge -y open-vm-tools open-vm-tools-desktop xserver-xorg-video-qxl qemu-guest-agent spice-vdagent spice-webdavd hyperv-daemons || true
+	chroot /target apt-get autoremove --purge -y open-vm-tools open-vm-tools-desktop open-vm-tools-containerinfo open-vm-tools-salt-minion open-vm-tools-sdmp xserver-xorg-video-qxl qemu-guest-agent spice-vdagent spice-webdavd hyperv-daemons || true
 
 elif [ $SYS_CHECK = QEMU ]; then
 	echo "Hypervisor detected: $SYS_CHECK. Removal of all other guest additions."
-	chroot /target apt-get autoremove --purge -y virtualbox-guest-utils virtualbox-guest-x11 open-vm-tools open-vm-tools-desktop hyperv-daemons || true
+	chroot /target apt-get autoremove --purge -y virtualbox-guest-utils virtualbox-guest-x11 open-vm-tools open-vm-tools-desktop open-vm-tools-containerinfo open-vm-tools-salt-minion open-vm-tools-sdmp hyperv-daemons || true
 
 elif [ $SYSTEMD_CHECK = microsoft ]; then
 	echo "Hypervisor detected: $SYSTEMD_CHECK. Removal of all other guest additions."
-	chroot /target apt-get autoremove --purge -y virtualbox-guest-utils virtualbox-guest-x11 open-vm-tools open-vm-tools-desktop xserver-xorg-video-qxl qemu-guest-agent spice-vdagent spice-webdavd || true
+	chroot /target apt-get autoremove --purge -y virtualbox-guest-utils virtualbox-guest-x11 open-vm-tools open-vm-tools-desktop open-vm-tools-containerinfo open-vm-tools-salt-minion open-vm-tools-sdmp xserver-xorg-video-qxl qemu-guest-agent spice-vdagent spice-webdavd || true
 
 elif [ $SYSTEMD_CHECK = none ] || [ $SYSTEMD_CHECK = zvm ] || [ $SYSTEMD_CHECK = powervm ] || [ $SYSTEMD_CHECK = xen ] || [ $SYSTEMD_CHECK = bochs ] || [ $SYSTEMD_CHECK = uml ] || [ $SYSTEMD_CHECK = parallels ] || [ $SYSTEMD_CHECK = bhyve ] || [ $SYSTEMD_CHECK = qnx ] || [ $SYSTEMD_CHECK = acrn ]; then
 	echo "No hypervisor detected with preinstalled guest additions. Deletion of all guest additions."
-	chroot /target apt-get autoremove --purge -y virtualbox-guest-utils virtualbox-guest-x11 open-vm-tools open-vm-tools-desktop xserver-xorg-video-qxl qemu-guest-agent spice-vdagent spice-webdavd hyperv-daemons || true
+	chroot /target apt-get autoremove --purge -y virtualbox-guest-utils virtualbox-guest-x11 open-vm-tools open-vm-tools-desktop open-vm-tools-containerinfo open-vm-tools-salt-minion open-vm-tools-sdmp xserver-xorg-video-qxl qemu-guest-agent spice-vdagent spice-webdavd hyperv-daemons || true
 fi
+fi
+
+#Add the created user to the vboxusers group if it exists
+VBOXUSERS_GROUP=$(chroot /target grep -o vboxusers /etc/group || true)
+if [ $VBOXUSERS_GROUP = vboxusers ]; then
+	echo "The vboxusers group exist. Adding the created user in this group..."
+	for user in $(awk -F: '/\/home/ {printf "%s:%s\n",$1,$3}' /target/etc/passwd | cut -d: -f1)
+	do
+		chroot /target usermod -a -G vboxusers "$user" || true
+	done
+	echo "Done"
+fi
+
+#Add the created user to the vboxsf group if it exists
+VBOXSF_GROUP=$(chroot /target grep -o vboxsf /etc/group || true)
+if [ $VBOXSF_GROUP = vboxsf ]; then
+	echo "The vboxsf group exist. Adding the created user in this group..."
+        for user in $(awk -F: '/\/home/ {printf "%s:%s\n",$1,$3}' /target/etc/passwd | cut -d: -f1)
+        do
+                chroot /target usermod -a -G vboxsf "$user" || true
+        done
+	echo "Done"
 fi
 
 #Check if / use BTRFS as filesystem to remove kaisen-btrfs-snapshots if BTRFS not use
