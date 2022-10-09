@@ -24,23 +24,23 @@ mount_fs
 
 if [ $SYSTEMD_CHECK = vmware ]; then
 	echo "Hypervisor detected: $SYSTEMD_CHECK. Removal of all other guest additions."
-	chroot /target apt-get autoremove --purge -y virtualbox-guest-utils virtualbox-guest-x11 xserver-xorg-video-qxl qemu-guest-agent spice-vdagent spice-webdavd hyperv-daemons || true
+	in-target apt-get autoremove --purge -y virtualbox-guest-utils virtualbox-guest-x11 xserver-xorg-video-qxl qemu-guest-agent spice-vdagent spice-webdavd hyperv-daemons || true
 
 elif [ $SYS_CHECK = innotek ]; then
 	echo "Hypervisor detected: $SYS_CHECK (VirtualBox). Removal of all other guest additions."
-	chroot /target apt-get autoremove --purge -y open-vm-tools open-vm-tools-desktop open-vm-tools-containerinfo open-vm-tools-salt-minion open-vm-tools-sdmp xserver-xorg-video-qxl qemu-guest-agent spice-vdagent spice-webdavd hyperv-daemons || true
+	in-target apt-get autoremove --purge -y open-vm-tools open-vm-tools-desktop open-vm-tools-containerinfo open-vm-tools-salt-minion open-vm-tools-sdmp xserver-xorg-video-qxl qemu-guest-agent spice-vdagent spice-webdavd hyperv-daemons || true
 
 elif [ $SYS_CHECK = QEMU ]; then
 	echo "Hypervisor detected: $SYS_CHECK. Removal of all other guest additions."
-	chroot /target apt-get autoremove --purge -y virtualbox-guest-utils virtualbox-guest-x11 open-vm-tools open-vm-tools-desktop open-vm-tools-containerinfo open-vm-tools-salt-minion open-vm-tools-sdmp hyperv-daemons || true
+	in-target apt-get autoremove --purge -y virtualbox-guest-utils virtualbox-guest-x11 open-vm-tools open-vm-tools-desktop open-vm-tools-containerinfo open-vm-tools-salt-minion open-vm-tools-sdmp hyperv-daemons || true
 
 elif [ $SYSTEMD_CHECK = microsoft ]; then
 	echo "Hypervisor detected: $SYSTEMD_CHECK. Removal of all other guest additions."
-	chroot /target apt-get autoremove --purge -y virtualbox-guest-utils virtualbox-guest-x11 open-vm-tools open-vm-tools-desktop open-vm-tools-containerinfo open-vm-tools-salt-minion open-vm-tools-sdmp xserver-xorg-video-qxl qemu-guest-agent spice-vdagent spice-webdavd || true
+	in-target apt-get autoremove --purge -y virtualbox-guest-utils virtualbox-guest-x11 open-vm-tools open-vm-tools-desktop open-vm-tools-containerinfo open-vm-tools-salt-minion open-vm-tools-sdmp xserver-xorg-video-qxl qemu-guest-agent spice-vdagent spice-webdavd || true
 
 elif [ $SYSTEMD_CHECK = none ] || [ $SYSTEMD_CHECK = zvm ] || [ $SYSTEMD_CHECK = powervm ] || [ $SYSTEMD_CHECK = xen ] || [ $SYSTEMD_CHECK = bochs ] || [ $SYSTEMD_CHECK = uml ] || [ $SYSTEMD_CHECK = parallels ] || [ $SYSTEMD_CHECK = bhyve ] || [ $SYSTEMD_CHECK = qnx ] || [ $SYSTEMD_CHECK = acrn ]; then
 	echo "No hypervisor detected with preinstalled guest additions. Deletion of all guest additions."
-	chroot /target apt-get autoremove --purge -y virtualbox-guest-utils virtualbox-guest-x11 open-vm-tools open-vm-tools-desktop open-vm-tools-containerinfo open-vm-tools-salt-minion open-vm-tools-sdmp xserver-xorg-video-qxl qemu-guest-agent spice-vdagent spice-webdavd hyperv-daemons || true
+	in-target apt-get autoremove --purge -y virtualbox-guest-utils virtualbox-guest-x11 open-vm-tools open-vm-tools-desktop open-vm-tools-containerinfo open-vm-tools-salt-minion open-vm-tools-sdmp xserver-xorg-video-qxl qemu-guest-agent spice-vdagent spice-webdavd hyperv-daemons || true
 fi
 fi
 
@@ -50,7 +50,7 @@ if [ $VBOXUSERS_GROUP = vboxusers 2> /dev/null ]; then
 	echo "The vboxusers group exist. Adding the created user in this group..."
 	for user in $(awk -F: '/\/home/ {printf "%s:%s\n",$1,$3}' /target/etc/passwd | cut -d: -f1)
 	do
-		chroot /target usermod -a -G vboxusers "$user" || true
+		in-target usermod -a -G vboxusers "$user" || true
 	done
 	echo "Done"
 fi
@@ -61,7 +61,7 @@ if [ $VBOXSF_GROUP = vboxsf 2> /dev/null ]; then
 	echo "The vboxsf group exist. Adding the created user in this group..."
         for user in $(awk -F: '/\/home/ {printf "%s:%s\n",$1,$3}' /target/etc/passwd | cut -d: -f1)
         do
-                chroot /target usermod -a -G vboxsf "$user" || true
+                in-target usermod -a -G vboxsf "$user" || true
         done
 	echo "Done"
 fi
@@ -72,18 +72,13 @@ CHECK_FSTAB=$(grep -v -E "^(#|$)" /target/etc/fstab | grep -v /bin | grep -v /bo
 CHECK_SUBVOL=$(chroot /target btrfs subvolume list / 2> /dev/null | chroot /target grep -o @ 2> /dev/null || true)
 
 if [ $CHECK_ROOTFS = btrfs 2> /dev/null ] && [ $CHECK_FSTAB = "subvol=@" 2> /dev/null ] && [ $CHECK_SUBVOL = @ 2> /dev/null ]; then
-	echo "BTRFS is the filesystem use for / partition, and the / partition is mount in the @ subvolume. No action required."
+	echo "BTRFS is the filesystem use for the / partition, and the / partition is mount in the @ subvolume. Installation of the BTRFS snapshots tools..."
+	in-target apt-get install -y kaisen-btrfs-snapshots || true
 else
-	echo "BTRFS is not use for / partition or the / partition is not mount in the @ subvolume. Remove snapshots tools."
-        chroot /target apt-get autoremove --purge -y kaisen-btrfs-snapshots || true
+	echo "BTRFS is not use for the / partition or the / partition isn't mounted in the @ subvolume. No action is required."
 fi
 
 umount_fs
 
 #Unhold kernel
 chroot /target sh -c '/usr/bin/apt-mark showhold | while read kernel;do /usr/bin/apt-mark unhold $kernel;done' || true
-
-#Readding executable bit of apt-btrfs-snapshot
-if [ -e /target/usr/bin/apt-btrfs-snapshot ] && [ ! -x /target/usr/bin/apt-btrfs-snapshot ]; then
-	chmod +x /target/usr/bin/apt-btrfs-snapshot
-fi
