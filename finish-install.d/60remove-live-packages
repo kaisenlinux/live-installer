@@ -23,7 +23,7 @@ done
 # - Ubuntu: casper
 
 if [ $do_manual_removal ]; then
-	for package in live-boot live-boot-initramfs-tools live-config live-config-runit live-config-systemd live-config-sysvinit live-config-upstart debian-installer-launcher casper calamares-settings-debian live-tools user-setup; do
+	for package in live-boot live-boot-initramfs-tools live-config live-config-runit live-config-systemd live-config-sysvinit live-config-upstart debian-installer-launcher casper calamares-settings-debian live-tools user-setup kaisen-live-guest-additions; do
 		if [ -f /target/var/lib/dpkg/info/$package.list ]; then
 			in-target apt-get --yes purge $package
 			do_initrd=true

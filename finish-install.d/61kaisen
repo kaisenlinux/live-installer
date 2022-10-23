@@ -1,7 +1,7 @@
 #!/bin/sh
 
 #Remove unnecessary guests additions preinstalled
-if [ -e /target/usr/bin/systemd-detect-virt ] && [ -x /target/usr/bin/systemd-detect-virt ]; then
+if [ -x /target/usr/bin/systemd-detect-virt ]; then
 
 SYSTEMD_CHECK=$(chroot /target systemd-detect-virt || true)
 SYS_CHECK=$(cat /sys/class/dmi/id/sys_vendor | cut -d' ' -f1)
@@ -17,7 +17,6 @@ umount_fs() {
                 umount /target/sys
                 umount /target/proc
                 umount /target/dev/pts
-                umount /target/dev
 }
 
 mount_fs
@@ -25,14 +24,17 @@ mount_fs
 if [ $SYSTEMD_CHECK = vmware ]; then
 	echo "Hypervisor detected: $SYSTEMD_CHECK. Removal of all other guest additions."
 	in-target apt-get autoremove --purge -y virtualbox-guest-utils virtualbox-guest-x11 xserver-xorg-video-qxl qemu-guest-agent spice-vdagent spice-webdavd hyperv-daemons || true
+	in-target systemctl enable open-vm-tools vgauth
 
 elif [ $SYS_CHECK = innotek ]; then
 	echo "Hypervisor detected: $SYS_CHECK (VirtualBox). Removal of all other guest additions."
 	in-target apt-get autoremove --purge -y open-vm-tools open-vm-tools-desktop open-vm-tools-containerinfo open-vm-tools-salt-minion open-vm-tools-sdmp xserver-xorg-video-qxl qemu-guest-agent spice-vdagent spice-webdavd hyperv-daemons || true
+	in-target systemctl enable virtualbox-guest-utils
 
 elif [ $SYS_CHECK = QEMU ]; then
 	echo "Hypervisor detected: $SYS_CHECK. Removal of all other guest additions."
 	in-target apt-get autoremove --purge -y virtualbox-guest-utils virtualbox-guest-x11 open-vm-tools open-vm-tools-desktop open-vm-tools-containerinfo open-vm-tools-salt-minion open-vm-tools-sdmp hyperv-daemons || true
+	in-target systemctl enable spice-vdagentd.service spice-vdagentd.socket spice-webdavd.service qemu-guest-agent.service
 
 elif [ $SYSTEMD_CHECK = microsoft ]; then
 	echo "Hypervisor detected: $SYSTEMD_CHECK. Removal of all other guest additions."

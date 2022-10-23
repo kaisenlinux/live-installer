@@ -1,3 +1,10 @@
+live-installer (57+kaisen15) kaisen-packages; urgency=medium
+
+  * Force the activation of guest tools daemons
+  * Add the kaisen-live-guest-additions package to the removal
+
+ -- Kevin Chevreuil - Kaisen <kaisen@kaisenlinux.org>  Sun, 23 Oct 2022 16:52:16 +0100
+
 live-installer (57+kaisen14) kaisen-packages; urgency=medium
 
   * Force the deinstallation with purge of live-tools and user-setup packages
