@@ -1,3 +1,9 @@
+live-installer (57+kaisen16) kaisen-packages; urgency=medium
+
+  * Force the activation of BTRFS quota
+
+ -- Kevin Chevreuil - Kaisen <kaisen@kaisenlinux.org>  Wed, 30 Nov 2022 16:38:02 +0100
+
 live-installer (57+kaisen15) kaisen-packages; urgency=medium
 
   * Force the activation of guest tools daemons

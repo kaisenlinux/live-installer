@@ -76,6 +76,8 @@ CHECK_SUBVOL=$(chroot /target btrfs subvolume list / 2> /dev/null | chroot /targ
 if [ $CHECK_ROOTFS = btrfs 2> /dev/null ] && [ $CHECK_FSTAB = "subvol=@" 2> /dev/null ] && [ $CHECK_SUBVOL = @ 2> /dev/null ]; then
 	echo "BTRFS is the filesystem use for the / partition, and the / partition is mount in the @ subvolume. Installation of the BTRFS snapshots tools..."
 	in-target apt-get install -y kaisen-btrfs-snapshots || true
+	#Force the activation of BTRFS quota
+	in-target btrfs quota enable /
 else
 	echo "BTRFS is not use for the / partition or the / partition isn't mounted in the @ subvolume. No action is required."
 fi
