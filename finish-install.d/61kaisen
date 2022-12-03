@@ -82,6 +82,12 @@ else
 	echo "BTRFS is not use for the / partition or the / partition isn't mounted in the @ subvolume. No action is required."
 fi
 
+#Update the files database for the plocate command
+if command -v updatedb &> /dev/null
+then
+        updatedb
+fi
+
 umount_fs
 
 #Unhold kernel
