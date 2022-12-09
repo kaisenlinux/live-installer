@@ -83,9 +83,8 @@ else
 fi
 
 #Update the files database for the plocate command
-if command -v updatedb &> /dev/null
-then
-        updatedb
+if [ -x /target/usr/bin/updatedb ]; then
+        in-target updatedb
 fi
 
 umount_fs
