@@ -78,6 +78,7 @@ if [ $CHECK_ROOTFS = btrfs 2> /dev/null ] && [ $CHECK_FSTAB = "subvol=@" 2> /dev
 	in-target apt-get install -y kaisen-btrfs-snapshots || true
 	#Force the activation of BTRFS quota
 	in-target btrfs quota enable /
+	in-target btrfs quota enable /home
 else
 	echo "BTRFS is not use for the / partition or the / partition isn't mounted in the @ subvolume. No action is required."
 fi

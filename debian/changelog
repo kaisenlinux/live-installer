@@ -1,3 +1,9 @@
+live-installer (57+kaisen19) kaisen-packages; urgency=medium
+
+  * Add the /home for the BTRFS quotas activation
+
+ -- Kevin Chevreuil - Kaisen <kaisen@kaisenlinux.org>  Mon, 12 Dec 2022 12:31:41 +0100
+
 live-installer (57+kaisen18) kaisen-packages; urgency=medium
 
   * Fix the no exec of the updatedb command
