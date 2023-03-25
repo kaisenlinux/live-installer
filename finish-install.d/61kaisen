@@ -112,7 +112,7 @@ else
 fi
 
 #Update the files database for the plocate command
-if in-target command -v updatedb &> /dev/null
+in-target if command -v updatedb &> /dev/null
 then
         in-target updatedb
 fi
