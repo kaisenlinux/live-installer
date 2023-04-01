@@ -106,9 +106,7 @@ else
 fi
 
 #Update the files database for the plocate command
-if [ -x /target/usr/bin/updatedb ]; then
-	in-target updatedb
-fi
+chroot /target updatedb 2> /dev/null || true
 
 #Unhold kernel
 chroot /target sh -c '/usr/bin/apt-mark showhold | while read kernel;do /usr/bin/apt-mark unhold $kernel;done' || true
