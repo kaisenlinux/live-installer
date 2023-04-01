@@ -1,3 +1,16 @@
+live-installer (57+kaisen23) kaisen-packages; urgency=medium
+
+  * Force the deactivation of BTRFS quotas
+
+ -- Kevin Chevreuil - Kaisen <kaisen@kaisenlinux.org>  Sat, 01 Apr 2023 15:40:16 +0100
+
+live-installer (57+kaisen22) kaisen-packages; urgency=medium
+
+  * Revert the if statement for the updatedb command
+  * Remove the umount_fs function
+
+ -- Kevin Chevreuil - Kaisen <kaisen@kaisenlinux.org>  Sat, 25 Mar 2023 19:32:11 +0100
+
 live-installer (57+kaisen21) kaisen-packages; urgency=medium
 
   * Add the user created in the libvirt group

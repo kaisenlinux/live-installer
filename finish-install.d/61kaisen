@@ -13,12 +13,6 @@ mount_fs() {
                 mount --bind /dev/pts /target/dev/pts
 }
 
-umount_fs() {
-                umount /target/sys
-                umount /target/proc
-                umount /target/dev/pts
-}
-
 mount_fs
 
 if [ $SYSTEMD_CHECK = vmware ]; then
@@ -104,20 +98,17 @@ CHECK_SUBVOL=$(chroot /target btrfs subvolume list / 2> /dev/null | chroot /targ
 if [ $CHECK_ROOTFS = btrfs 2> /dev/null ] && [ $CHECK_FSTAB = "subvol=@" 2> /dev/null ] && [ $CHECK_SUBVOL = @ 2> /dev/null ]; then
 	echo "BTRFS is the filesystem use for the / partition, and the / partition is mount in the @ subvolume. Installation of the BTRFS snapshots tools..."
 	in-target apt-get install -y kaisen-btrfs-snapshots || true
-	#Force the activation of BTRFS quota
-	in-target btrfs quota enable /
-	in-target btrfs quota enable /home
+	#Force the deactivation of BTRFS quota
+	in-target btrfs quota disable /
+	in-target btrfs quota disable /home
 else
 	echo "BTRFS is not use for the / partition or the / partition isn't mounted in the @ subvolume. No action is required."
 fi
 
 #Update the files database for the plocate command
-if in-target command -v updatedb &> /dev/null
-then
-        in-target updatedb
+if [ -x /target/usr/bin/updatedb ]; then
+	in-target updatedb
 fi
-
-umount_fs
 
 #Unhold kernel
 chroot /target sh -c '/usr/bin/apt-mark showhold | while read kernel;do /usr/bin/apt-mark unhold $kernel;done' || true
