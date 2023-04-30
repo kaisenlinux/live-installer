@@ -110,3 +110,7 @@ chroot /target updatedb 2> /dev/null || true
 
 #Unhold kernel
 chroot /target sh -c '/usr/bin/apt-mark showhold | while read kernel;do /usr/bin/apt-mark unhold $kernel;done' || true
+
+#Force the ejection of the CDROM after the installation
+CDROM=$(mount | grep "on /cdrom" | cut -d ' ' -f 1)
+eject -F $CDROM 2> /dev/null || true
