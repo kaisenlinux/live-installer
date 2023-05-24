@@ -3,8 +3,8 @@ Section: debian-installer
 Priority: optional
 XSBC-Original-Maintainer: Debian Install System Team <debian-boot@lists.debian.org>
 Maintainer: Kevin Chevreuil - Kaisen <kaisen@kaisenlinux.org>
-Build-Depends: debhelper (>= 13), po-debconf
-Standards-Version: 4.5.1
+Standards-Version: 4.6.1
+Build-Depends: debhelper-compat (= 13), po-debconf
 Vcs-Browser: https://gitlab.com/kaisenlinux/packages/live-installer
 Vcs-Git: https://gitlab.com/kaisenlinux/packages/live-installer.git
 
@@ -13,12 +13,13 @@ Package-Type: udeb
 Architecture: any
 Depends: archdetect,
          attr-udeb,
-         base-installer (>= 1.105),
-         busybox-udeb (>= 1:1.13.3),
+         base-installer,
+         busybox-udeb,
          cdebconf-udeb,
          created-fstab,
          mounted-partitions,
-         ${shlibs:Depends}
+         ${shlibs:Depends},
+         ${misc:Depends}
 Provides: installed-base, kernel-installer
 XB-Installer-Menu-Item: 6490
 Description: Install the system

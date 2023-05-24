@@ -1,3 +1,35 @@
+live-installer (58+kaisen1) kaisen-packages; urgency=medium
+
+  * Import the 58 version
+
+ -- Kevin Chevreuil - Kaisen <kaisen@kaisenlinux.org>  Wed, 24 May 2023 13:29:03 +0100
+
+live-installer (58) unstable; urgency=medium
+
+  [ Jonathan Carter ]
+  * Fix typo in previous changelog entry
+  * Update standards version to 4.6.1
+  * Upload MR!3 from Roland Clobus
+    - Remove the live packages before the cdrom is unmounted
+  * Remove myself from uploaders
+
+  [ Cyril Brulebois ]
+  * Remove Christian Perrier from Uploaders, with many thanks for all
+    his contributions over the years! (Closes: #927548)
+
+  [ Holger Wansing ]
+  * Remove trailing whitespace from changelog file, to fix lintian tag.
+  * Change Format URI in copyright file to https, to fix lintian tag.
+
+  [ Debian Janitor ]
+  * Add missing ${misc:Depends} to Depends for live-installer.
+  * Drop custom source compression, custom source compression level.
+  * Bump debhelper from old 10 to 13.
+  * Set debhelper-compat version in Build-Depends.
+  * Update standards version to 4.6.0, no changes needed.
+
+ -- Jonathan Carter <jcc@debian.org>  Mon, 15 Apr 2019 17:43:07 +0000
+
 live-installer (57+kaisen26) kaisen-packages; urgency=medium
 
   * Improvement of log messages
