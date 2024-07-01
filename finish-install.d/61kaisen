@@ -114,7 +114,9 @@ echo "Unhold kernel packages to allow them to be updated..."
 chroot /target sh -c '/usr/bin/apt-mark showhold | while read kernel;do /usr/bin/apt-mark unhold $kernel;done' || true
 
 #Ensure that locales are well-defined
-chroot /target dpkg-reconfigure -fnoninteractive locales
+chroot /target locale-gen
+LOCALE=`cat /target/etc/locale.gen | grep -v -E "^(#|$)" | cut -d ' ' -f1`
+echo "LANG=$LOCALE" > /target/etc/locale.conf
 
 #Force the ejection of the CDROM after the installation
 CDROM=$(mount | grep "on /cdrom" | cut -d ' ' -f 1)
